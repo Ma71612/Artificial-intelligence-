@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="ar">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>مساعد البرمجة الذكي</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            background-color: #f4f4f4;
+        }
+        h1 {
+            color: #333;
+        }
+        select, textarea, button {
+            width: 90%;
+            margin: 10px;
+            padding: 10px;
+            font-size: 16px;
+        }
+        #editor {
+            width: 90%;
+            height: 300px;
+            border: 1px solid #ccc;
+            background: white;
+            text-align: left;
+        }
+        #output {
+            width: 90%;
+            height: 100px;
+            border: 1px solid #ccc;
+            background: #fff;
+            text-align: left;
+            padding: 10px;
+            overflow: auto;
+        }
+    </style>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/axios/0.21.1/axios.min.js"></script>
+</head>
+<body>
+
+    <h1>🔹 مساعد البرمجة الذكي 🔹</h1>
+    
+    <label for="language">اختر لغة البرمجة:</label>
+    <select id="language">
+        <option value="python">Python</option>
+        <option value="javascript">JavaScript</option>
+        <option value="java">Java</option>
+        <option value="cpp">C++</option>
+        <option value="html">HTML</option>
+    </select>
+
+    <textarea id="editor" placeholder="اكتب الكود هنا..."></textarea>
+
+    <button onclick="runCode()">💡 تشغيل الكود</button>
+    <button onclick="getAiSuggestion()">🤖 اقتراح من الذكاء الاصطناعي</button>
+
+    <h2>🔹 النتيجة 🔹</h2>
+    <div id="output"></div>
+
+    <script>
+        async function getAiSuggestion() {
+            let language = document.getElementById("language").value;
+            let prompt = `اكتب مثالًا لكود ${language} يقوم بطباعة "مرحبًا بالعالم"`;
+
+            let response = await axios.post("https://api.openai.com/v1/chat/completions", {
+                model: "gpt-3.5-turbo",
+                messages: [{ role: "user", content: prompt }],
+            }, {
+                headers: {
+                    "Authorization": "Bearer YOUR_OPENAI_API_KEY",
+                    "Content-Type": "application/json"
+                }
+            });
+
+            document.getElementById("editor").value = response.data.choices[0].message.content;
+        }
+
+        function runCode() {
+            let code = document.getElementById("editor").value;
+            let language = document.getElementById("language").value;
+            let outputDiv = document.getElementById("output");
+
+            if (language === "python") {
+                outputDiv.innerText = "⚠️ لا يمكن تشغيل Python مباشرة في المتصفح.";
+            } else if (language === "html") {
+                outputDiv.innerHTML = code;
+            } else {
+                try {
+                    let result = eval(code);
+                    outputDiv.innerText = result || "✅ تم التنفيذ بنجاح!";
+                } catch (error) {
+                    outputDiv.innerText = "❌ خطأ في الكود: " + error.message;
+                }
+            }
+        }
+    </script>
+
+</body>
+</html>
